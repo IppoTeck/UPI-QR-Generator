@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UPI QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <style>
+        #qrcode {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate UPI QR Code</h1>
+    <form id="upiForm">
+        <label for="upiId">UPI ID:</label>
+        <input type="text" id="upiId" required><br>
+        <label for="payeeName">Payee Name:</label>
+        <input type="text" id="payeeName"><br>
+        <label for="amount">Amount (in INR):</label>
+        <input type="number" id="amount" step="0.01" min="0"><br>
+        <label for="note">Transaction Note:</label>
+        <input type="text" id="note"><br>
+        <button type="button" onclick="generateQRCode()">Generate QR Code</button>
+    </form>
+    <div id="qrcode"></div>
+
+    <script>
+        function generateQRCode() {
+            // Collect and encode input values
+            const upiId = encodeURIComponent(document.getElementById('upiId').value.trim());
+            const payeeName = encodeURIComponent(document.getElementById('payeeName').value.trim());
+            const amount = parseFloat(document.getElementById('amount').value.trim());
+            const note = encodeURIComponent(document.getElementById('note').value.trim());
+
+            // Validate required fields
+            if (!upiId || isNaN(amount) || amount <= 0) {
+                alert('UPI ID and valid amount are required');
+                return;
+            }
+
+            // Construct the UPI URL
+            let baseUrl = `upi://pay?pa=${upiId}&am=${amount.toFixed(2)}&cu=INR`;
+            if (payeeName) baseUrl += `&pn=${payeeName}`;
+            if (note) baseUrl += `&tn=${note}`;
+
+            // Clear previous QR code
+            $('#qrcode').empty();
+
+            // Generate new QR code
+            $('#qrcode').qrcode({
+                text: baseUrl
+            });
+        }
+    </script>
+</body>
+</html>
